@@ -1,0 +1,5 @@
+# Python 3.10 (PsychoPy does not support newer Pythons yet)
+#   uv venv --python 3.10 .venv && uv pip install --python .venv/bin/python -r requirements.txt
+# Originally written for PsychoPy 1.83.04 / Python 2.7; ported minimally to Py3.
+psychopy==2026.2.4
+psychopy-mri-emulator==0.0.2

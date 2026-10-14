@@ -23,7 +23,7 @@ import sys # to get file system encoding
 import hcpcommon
 hcpcommon.checkScreenCount()
 # Ensure that relative paths start from the same directory as this script
-_thisDir = os.path.dirname(os.path.abspath(__file__)).decode(sys.getfilesystemencoding())
+_thisDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(_thisDir)
 
 # Store info about the experiment session
@@ -52,7 +52,7 @@ endExpNow = False  # flag for 'escape' or other condition => quit the exp
 # Start Code - component code to be run before the window creation
 ## EKK Screen Edit of compiled script
 import pyglet
-display = pyglet.window.get_platform().get_default_display()
+display = pyglet.canvas.get_display()
 screens = display.get_screens()
 resolution = [screens[-1].width, screens[-1].height]
 import yaml
@@ -175,7 +175,7 @@ introText2 = visual.TextStim(win=win, ori=0, name='introText2',
 # Record Git Status in Subject Logs
 from subprocess import check_output, check_call, CalledProcessError
 try:
-    revision = check_output(['git','rev-parse', '--short', 'HEAD'])
+    revision = check_output(['git','rev-parse', '--short', 'HEAD']).decode()
     revision = revision.strip()
     gitInstalled = True
 except:
@@ -191,7 +191,7 @@ if gitInstalled:
         check_call(['git', 'diff-files', '--quiet'])
     except CalledProcessError:
         revision = 'Task changes detected. Nearest head: %s' % revision
-        status_msg = check_output(['git', 'status'])
+        status_msg = check_output(['git', 'status']).decode()
         msg ="""%s
 
 Warning: the experiment has unexpected changes.
@@ -489,7 +489,10 @@ if trigger == 'parallel':
     from psychopy.contrib import parallel as winioport
     #from psychopy import parallel
 elif trigger == 'usb':
-    from psychopy.hardware.emulator import launchScan
+    try:  # PsychoPy >= 2024: launchScan moved to the psychopy-mri-emulator plugin
+        from psychopy_mri_emulator import launchScan
+    except ImportError:
+        from psychopy.hardware.emulator import launchScan
     #
     # settings for launchScan:
     MR_settings = { 
@@ -587,7 +590,7 @@ COLUMNS = [
     'condFile', 'trialResp.keys', 'trialResp.rt',
     'resp', 'msg', 'corrRespMsg', 'corrRespCode', 
     'countConsecutive',
-] + expInfo.keys()
+] + list(expInfo.keys())
 
 def updateRunLog(entries):
     df = pd.DataFrame(entries)
@@ -771,14 +774,14 @@ thisPracDirection = pracDirections.trialList[0]  # so we can initialise stimuli 
 # abbreviate parameter names if possible (e.g. rgb=thisPracDirection.rgb)
 if thisPracDirection != None:
     for paramName in thisPracDirection.keys():
-        exec(paramName + '= thisPracDirection.' + paramName)
+        exec(paramName + '= thisPracDirection[paramName]')
 
 for thisPracDirection in pracDirections:
     currentLoop = pracDirections
     # abbreviate parameter names if possible (e.g. rgb = thisPracDirection.rgb)
     if thisPracDirection != None:
         for paramName in thisPracDirection.keys():
-            exec(paramName + '= thisPracDirection.' + paramName)
+            exec(paramName + '= thisPracDirection[paramName]')
     
     #------Prepare to start Routine "pracInstr1"-------
     t = 0
@@ -1362,14 +1365,14 @@ for thisPracDirection in pracDirections:
     # abbreviate parameter names if possible (e.g. rgb=thisExampleTrial.rgb)
     if thisExampleTrial != None:
         for paramName in thisExampleTrial.keys():
-            exec(paramName + '= thisExampleTrial.' + paramName)
+            exec(paramName + '= thisExampleTrial[paramName]')
     
     for thisExampleTrial in exampleTrials:
         currentLoop = exampleTrials
         # abbreviate parameter names if possible (e.g. rgb = thisExampleTrial.rgb)
         if thisExampleTrial != None:
             for paramName in thisExampleTrial.keys():
-                exec(paramName + '= thisExampleTrial.' + paramName)
+                exec(paramName + '= thisExampleTrial[paramName]')
         
         #------Prepare to start Routine "exampleTrial"-------
         t = 0
@@ -1486,7 +1489,7 @@ for thisPracDirection in pracDirections:
                     logging.error('AllowedKeys variable `allowed_keys` is not defined.')
                     core.quit()
                 if not type(allowed_keys) in [list, tuple, np.ndarray]:
-                    if not isinstance(allowed_keys, basestring):
+                    if not isinstance(allowed_keys, str):
                         logging.error('AllowedKeys variable `allowed_keys` is not string- or list-like.')
                         core.quit()
                     elif not ',' in allowed_keys: allowed_keys = (allowed_keys,)
@@ -1968,14 +1971,14 @@ thisScanDirection = scanDirections.trialList[0]  # so we can initialise stimuli 
 # abbreviate parameter names if possible (e.g. rgb=thisScanDirection.rgb)
 if thisScanDirection != None:
     for paramName in thisScanDirection.keys():
-        exec(paramName + '= thisScanDirection.' + paramName)
+        exec(paramName + '= thisScanDirection[paramName]')
 
 for thisScanDirection in scanDirections:
     currentLoop = scanDirections
     # abbreviate parameter names if possible (e.g. rgb = thisScanDirection.rgb)
     if thisScanDirection != None:
         for paramName in thisScanDirection.keys():
-            exec(paramName + '= thisScanDirection.' + paramName)
+            exec(paramName + '= thisScanDirection[paramName]')
     
     #------Prepare to start Routine "scanInstr1"-------
     t = 0
@@ -2122,14 +2125,14 @@ thisRun = runs.trialList[0]  # so we can initialise stimuli with some values
 # abbreviate parameter names if possible (e.g. rgb=thisRun.rgb)
 if thisRun != None:
     for paramName in thisRun.keys():
-        exec(paramName + '= thisRun.' + paramName)
+        exec(paramName + '= thisRun[paramName]')
 
 for thisRun in runs:
     currentLoop = runs
     # abbreviate parameter names if possible (e.g. rgb = thisRun.rgb)
     if thisRun != None:
         for paramName in thisRun.keys():
-            exec(paramName + '= thisRun.' + paramName)
+            exec(paramName + '= thisRun[paramName]')
     
     #------Prepare to start Routine "waitingScanner"-------
     t = 0
@@ -2252,14 +2255,14 @@ for thisRun in runs:
     # abbreviate parameter names if possible (e.g. rgb=thisCountdown.rgb)
     if thisCountdown != None:
         for paramName in thisCountdown.keys():
-            exec(paramName + '= thisCountdown.' + paramName)
+            exec(paramName + '= thisCountdown[paramName]')
     
     for thisCountdown in countdowns:
         currentLoop = countdowns
         # abbreviate parameter names if possible (e.g. rgb = thisCountdown.rgb)
         if thisCountdown != None:
             for paramName in thisCountdown.keys():
-                exec(paramName + '= thisCountdown.' + paramName)
+                exec(paramName + '= thisCountdown[paramName]')
         
         #------Prepare to start Routine "countdown"-------
         t = 0
@@ -2360,14 +2363,14 @@ for thisRun in runs:
     # abbreviate parameter names if possible (e.g. rgb=thisBlock.rgb)
     if thisBlock != None:
         for paramName in thisBlock.keys():
-            exec(paramName + '= thisBlock.' + paramName)
+            exec(paramName + '= thisBlock[paramName]')
     
     for thisBlock in blocks:
         currentLoop = blocks
         # abbreviate parameter names if possible (e.g. rgb = thisBlock.rgb)
         if thisBlock != None:
             for paramName in thisBlock.keys():
-                exec(paramName + '= thisBlock.' + paramName)
+                exec(paramName + '= thisBlock[paramName]')
         
         #------Prepare to start Routine "cue"-------
         t = 0
@@ -2471,14 +2474,14 @@ for thisRun in runs:
         # abbreviate parameter names if possible (e.g. rgb=thisTrial.rgb)
         if thisTrial != None:
             for paramName in thisTrial.keys():
-                exec(paramName + '= thisTrial.' + paramName)
+                exec(paramName + '= thisTrial[paramName]')
         
         for thisTrial in trials:
             currentLoop = trials
             # abbreviate parameter names if possible (e.g. rgb = thisTrial.rgb)
             if thisTrial != None:
                 for paramName in thisTrial.keys():
-                    exec(paramName + '= thisTrial.' + paramName)
+                    exec(paramName + '= thisTrial[paramName]')
             
             #------Prepare to start Routine "trial"-------
             t = 0
@@ -2596,7 +2599,7 @@ for thisRun in runs:
                         logging.error('AllowedKeys variable `allowed_keys` is not defined.')
                         core.quit()
                     if not type(allowed_keys) in [list, tuple, np.ndarray]:
-                        if not isinstance(allowed_keys, basestring):
+                        if not isinstance(allowed_keys, str):
                             logging.error('AllowedKeys variable `allowed_keys` is not string- or list-like.')
                             core.quit()
                         elif not ',' in allowed_keys: allowed_keys = (allowed_keys,)

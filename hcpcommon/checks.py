@@ -3,7 +3,7 @@ from psychopy import gui, logging, core
 
 def checkScreenCount():
     '''Present a dialog if there are less than 2 screens present.'''
-    display = pyglet.window.get_platform().get_default_display()
+    display = pyglet.canvas.get_display()
     screens = display.get_screens()
     if len(screens) < 2:
         dlg = buildScreenCountWarning()
