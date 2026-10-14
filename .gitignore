@@ -1,0 +1,11 @@
+.DS_Store
+data
+dist
+*.pyc
+*.orig
+*.rej
+siteConfig.yaml
+*_lastrun.py
+
+.venv/
+._*
