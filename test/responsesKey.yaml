@@ -5,7 +5,7 @@
         - [trialCondition, shape, 6]
         - [trialCondition, face, 6]
       values:
-        - [runEndTime, 50.00]  # In seconds
+        - [runEndTime, 58.4]  # In seconds (50 s of blocks + 8.4 s final fixation)
   expInfo:
     participant: testKidPrac
     session: practice
