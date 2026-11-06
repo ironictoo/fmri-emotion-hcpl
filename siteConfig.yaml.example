@@ -1,7 +1,8 @@
-trigger: '7'
-keys:
-  'left': ['1', 'num_1']
-  'right': ['2', 'num_2']
+trigger: 't'  # key the scanner sends at the start of each volume
+keys:  # button box: buttons 1-4 send a b c d (button box in the right hand)
+  'left': ['a']   # button 1, pointer (index) finger: left image matches
+  'right': ['b']  # button 2, middle finger: right image matches
+outputDir: '~/fmri_data/EMOTION_HCPL'  # local folder for data files (created if missing)
 'style':  # Units: deg
   'titleLetterSize': 3
   'subtitleLetterSize': .7
@@ -9,6 +10,8 @@ keys:
   'fixLetterSize': 2.5
   'wrapWidth': 16
 'monitor':
+  'screens': 1  # 1 = one display, or the laptop cloned to the scanner screen (task full screen,
+                #     no experimenter window); 2 = experimenter window on screen 0, task on 'screen'
+  'screen': 1   # task screen index when screens is 2
   'width': 28.5
   'distance': 70
-  'screen': 1

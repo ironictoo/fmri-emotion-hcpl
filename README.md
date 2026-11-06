@@ -64,9 +64,9 @@ trigger.
 - Python 3.10. Current PsychoPy does not support newer Python versions.
 - [uv](https://docs.astral.sh/uv/) to create the environment (plain
   `python -m venv` + `pip` also works).
-- Two displays: the experimenter's instructions appear on the primary screen
-  and the task on the second screen. With only one screen the script warns
-  and both windows open on the same display.
+- One display (default), e.g. a laptop cloned to the scanner screen; or two
+  displays, with the experimenter's script on one and the task on the other
+  (`monitor: screens` in `siteConfig.yaml`).
 - Tested on Linux (Ubuntu, X11/XWayland). The original task ran on macOS and
   Windows; those platforms have not been retested since the update.
 
@@ -93,34 +93,50 @@ Edit your copy before the first run (see the next section).
 ## Site configuration (`siteConfig.yaml`)
 
 ```yaml
-trigger: '7'                # key the scanner sends at the start of each volume
-keys:
-  'left': ['1', 'num_1']    # any of these keys means "left image matches"
-  'right': ['2', 'num_2']   # any of these keys means "right image matches"
+trigger: 't'                # key the scanner sends at the start of each volume
+keys:                       # button box: buttons 1-4 send a b c d
+  'left': ['a']             # button 1, pointer (index) finger: left image matches
+  'right': ['b']            # button 2, middle finger: right image matches
+outputDir: '~/fmri_data/EMOTION_HCPL'   # local folder for data files
 'style':                    # text sizes, in degrees of visual angle
   ...
 'monitor':
+  'screens': 1              # 1 = one display or cloned laptop; 2 = separate experimenter screen
+  'screen': 1               # task screen index when screens is 2
   'width': 28.5             # visible screen width in the scanner, cm
   'distance': 70            # eye-to-screen distance, cm
-  'screen': 1               # display index for the participant window
 ```
 
-- **Trigger and buttons:** set these to whatever your button box and scanner
-  send as keypresses. The trigger has to arrive as a USB keypress.
+- **Trigger and buttons:** the keypresses your scanner and button box send.
+  Each of `left`/`right` is a list, so you can add keys (e.g. `['a', 'h']` to
+  also accept a laptop key during training). The trigger has to arrive as a
+  USB keypress.
+- **Screens:** with `screens: 1` the task runs full screen on screen 0 and
+  there is no experimenter window (the participant would see it); read the
+  script below instead. With `screens: 2` the experimenter window opens on
+  screen 0 and the task on screen `screen`.
+- **Output:** files go to `outputDir`, a local folder (created if missing).
+  A relative path is taken from the repo folder. Copy the files to the network
+  drive after each session.
 - **Stimulus size:** stimuli are sized in degrees of visual angle. To match
   HCP, enter the real visible width and distance. To make the task fill your
   screen, adjust `distance`: increase it if the task is cut off, decrease it
   if it looks too small.
 
-The finger-introduction screens in the practice script always use keys
-`1` and `2`, whatever `keys` is set to.
-
 ## Running the task
+
+Training, before scanning, at the laptop:
 
 ```bash
 source .venv/bin/activate
-python EMOTION_Practice.py   # before scanning, outside the scanner
-python EMOTION_Scan.py       # in the scanner
+python EMOTION_Practice.py
+```
+
+In the scanner:
+
+```bash
+source .venv/bin/activate
+python EMOTION_Scan.py
 ```
 
 A dialog asks for:
@@ -131,17 +147,66 @@ A dialog asks for:
 | `mriMode` | `Off` to skip waiting for the trigger. Any other value (default for scan: `scan`) waits for the trigger. Case-sensitive: `off` or `OFF` will wait. |
 | `counterbalance` | `CB1`, `CB2` or `CB3` for the scan (no default; type it in); `practice` for the practice script |
 
-Space advances instruction screens. In scan mode, the "Get ready!" screen
-waits for the trigger key; to test outside the scanner you can press `7`
-yourself. Press Escape at any time to quit.
+Practice runs the instructions, a button introduction, example trials with
+feedback and a short 2-block rehearsal. The scan shows one reminder screen,
+then waits for the trigger and runs the 6 blocks.
+
+| When | Key | Effect |
+| --- | --- | --- |
+| Instruction screens | Space (experimenter) | Next screen |
+| Practice button introduction | `a` / `b` (participant) | Pointer / middle finger button, to continue |
+| Trials | `a` / `b` | Left / right image matches |
+| Scan "Get ready!" screen | `t` (scanner trigger) | Run starts; press `t` yourself to test |
+| End | Space | Exit |
+| Any time | Escape | Quit |
 
 Each script runs one run. To rerun after an interruption, start the script
 again; output files are timestamped, so nothing is overwritten.
 
+### Experimenter script (one screen)
+
+With `screens: 1` these lines are not shown anywhere, so read them from here.
+With `screens: 2` they appear on the experimenter screen.
+
+**Practice** (`EMOTION_Practice.py`)
+
+1. "Welcome to the Matching Game!" — Space
+2. "In this game, you will see groups of three faces or three shapes, arranged
+   in a triangle, as shown here." — Space
+3. "If the bottom left picture matches the top picture, like in this example,
+   you should push the button under your POINTER finger. Go ahead and press the
+   pointer finger button now." — wait for the participant to press button 1
+4. "And if the bottom right picture matches the top picture, like in this other
+   example, you should push the button under your MIDDLE finger. Press the
+   middle finger button now." — wait for button 2
+5. "While you play this game, we will remind you what buttons to press at the
+   bottom of the screen, as you can see here." — Space
+6. "Let's practice a few trials together." — Space, then two example trials
+   with feedback: watch, and make sure the participant understands the task
+7. "Do you have any questions? Now you will complete a short practice that will
+   look exactly like the game you will play in the scanner. In this practice,
+   we will not tell you if you are right or wrong. Just try your best to follow
+   the instructions and play the game." — Space
+8. "Are you ready to begin the practice?" — Space; the rehearsal starts (no
+   trigger). Watch and give feedback as needed. At the end, Space to exit.
+
+**Scan** (`EMOTION_Scan.py`)
+
+1. "Welcome back to the Matching Game!" — Space
+2. "Remember, in this game, your job is to indicate which face or shape on the
+   bottom row matches the face or shape on the top row. If the left picture
+   matches the top picture, press the button under your POINTER finger. If the
+   right picture matches the top picture, press the button under your MIDDLE
+   finger." — Space
+3. "Do you have any questions? Are you ready to play the game and be super
+   still in this scan?" — Space; the screen shows "Get ready!"
+4. Start the scan; the trigger (`t`) starts the run. At the end, Space to exit.
+
 ## Output files
 
-Files are written to `data/` next to the scripts. `data/` is ignored by git;
-never commit participant logs.
+Files are written to `outputDir` from `siteConfig.yaml` (default
+`~/fmri_data/EMOTION_HCPL`). Keep it outside the repo; `data/` is ignored by
+git in case it is used.
 
 | File | Contents |
 | --- | --- |
@@ -169,6 +234,10 @@ format:
 - PsychoPy: trial rows are now plain dicts, so `thisTrial.stimTop` became
   `thisTrial['stimTop']`. `launchScan` is imported from the
   `psychopy-mri-emulator` plugin, falling back to the old location.
+- Scanner laptop setup: trigger `t` and button box `a`/`b` in
+  `siteConfig.yaml.example`; the practice button introduction uses the
+  configured keys (it was fixed to `1`/`2`); `monitor: screens` for one
+  (cloned) display; output folder set by `outputDir`.
 - Repository: removed `.gitmodules` (`hcpcommon/` is included directly, not a
   submodule), added `requirements.txt`, test scripts and this README, and
   corrected the practice run length in `test/responsesKey.yaml` (50 s →
@@ -180,18 +249,21 @@ file and has not been updated.
 
 ## Testing
 
-The test runs a script on a virtual two-screen display, presses keys at
-the times listed in `test/responses*.csv`, and checks the trial counts and
-timings in the output against `test/responsesKey.yaml`. Each test runs in a
-temporary copy of the repo, so `data/` stays empty. You need `xvfb-run`
-(`sudo apt install xvfb`).
+The test runs a script on a virtual display, presses keys at the times
+listed in `test/responses*.csv` (`t`, `a`, `b`, Space), and checks the trial
+counts and timings in the output against `test/responsesKey.yaml`. Each test
+runs in a temporary copy of the repo and writes its output there. You need
+`xvfb-run` (`sudo apt install xvfb`).
 
 ```bash
 source .venv/bin/activate
-xvfb-run -a -s "-screen 0 1920x1080x24 -screen 1 1920x1080x24 +xinerama +extension GLX" \
+xvfb-run -a -s "-screen 0 1920x1080x24 +extension GLX" \
     python test/run_emulated.py EMOTION_Scan.py test/responsesScan.csv \
-    sessionID=testScan mriMode=scan counterbalance=CB1
+    sessionID=testScan mriMode=scan counterbalance=CB1 screens=1
 ```
+
+For two screens, use `screens=2` and
+`-s "-screen 0 1920x1080x24 -screen 1 1920x1080x24 +xinerama +extension GLX"`.
 
 `run_emulated.py` prints `Output: <folder>` when it starts. Check that run:
 
@@ -205,7 +277,7 @@ practice script use `EMOTION_Practice.py`, `test/responsesPractice.csv` and
 
 On the virtual display, trial counts, cue and fixation durations, and run
 length all match the expected values, and trial onsets stay on the 3 s grid.
-Stimulus durations measure 1.95–1.99 s rather than 2.00 s, so the 2 s duration
+Stimulus durations measure 1.94–1.99 s rather than 2.00 s, so the 2 s duration
 check can fail there by a few milliseconds. The task is non-slip (each routine
 is timed against a shared countdown), so a slow previous trial shortens the next
 one rather than shifting later onsets. Check `trialEndTime - trialStartTime` in

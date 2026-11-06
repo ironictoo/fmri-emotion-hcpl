@@ -1,13 +1,14 @@
 """Run a task script unattended, for testing.
 
-Copies the task into a temporary directory (so test logs never land in this
-repo's data/), fills in the start dialog from key=value arguments, and injects
-the keypresses listed in a test/responses*.csv file (seconds, key), timed from
-when both windows have opened.
+Copies the task into a temporary directory and writes its output there,
+fills in the start dialog from key=value arguments, and injects the keypresses
+listed in a test/responses*.csv file (seconds, key), timed from when both
+windows (task and experimenter) have opened. screens=1 or screens=2 overrides
+monitor:screens in the copied siteConfig.yaml.
 
 Usage (from the repo root, inside the venv):
     python test/run_emulated.py EMOTION_Scan.py test/responsesScan.csv \
-        sessionID=testScan mriMode=scan counterbalance=CB1
+        sessionID=testScan mriMode=scan counterbalance=CB1 screens=1
 
 Prints the output data directory when the run finishes. Use xvfb-run to run
 without a real display (see README).
@@ -19,9 +20,12 @@ import tempfile
 import threading
 import time
 
+import yaml
+
 repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 script, responses = sys.argv[1:3]
 fields = dict(a.split('=', 1) for a in sys.argv[3:])
+screens = fields.pop('screens', None)
 responses = os.path.abspath(responses)
 
 task_dir = os.path.join(tempfile.mkdtemp(prefix='emotion-test-'), 'task')
@@ -30,6 +34,12 @@ shutil.copytree(repo, task_dir,
 if not os.path.exists(os.path.join(task_dir, 'siteConfig.yaml')):
     shutil.copy(os.path.join(task_dir, 'siteConfig.yaml.example'),
                 os.path.join(task_dir, 'siteConfig.yaml'))
+config_file = os.path.join(task_dir, 'siteConfig.yaml')
+config = yaml.safe_load(open(config_file))
+config['outputDir'] = os.path.join(task_dir, 'data')
+if screens:
+    config['monitor']['screens'] = int(screens)
+yaml.safe_dump(config, open(config_file, 'w'))
 
 from psychopy import gui, visual, event  # noqa: E402
 

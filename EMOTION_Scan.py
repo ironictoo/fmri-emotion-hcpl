@@ -21,10 +21,25 @@ import sys # to get file system encoding
 
 # Common HCP Tools
 import hcpcommon
-hcpcommon.checkScreenCount()
 # Ensure that relative paths start from the same directory as this script
 _thisDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(_thisDir)
+
+# Site configuration: keys, trigger, screens and output folder
+import yaml
+if not os.path.exists('siteConfig.yaml'): raise IOError('Missing siteConfig.yaml - Please copy configuration text file')
+with open('siteConfig.yaml') as f:
+    config = yaml.safe_load(f)
+# screens: 1 = one display (or the laptop cloned to the scanner screen): the task runs full screen and
+# the experimenter window is hidden; 2 = experimenter window on screen 0, task on monitor:screen
+singleScreen = config['monitor'].get('screens', 2) == 1
+if not singleScreen:
+    hcpcommon.checkScreenCount()
+outputDir = os.path.expanduser(config.get('outputDir', 'data'))
+if not os.path.isabs(outputDir):
+    outputDir = os.path.join(_thisDir, outputDir)
+if not os.path.isdir(outputDir):
+    os.makedirs(outputDir)
 
 # Store info about the experiment session
 expName = 'EMOTION'  # from the Builder filename that created this script
@@ -35,7 +50,7 @@ expInfo['date'] = datetime.datetime.now().strftime('%Y-%m-%d_%H%M%S')  # add a s
 expInfo['expName'] = expName
 
 # Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
-filename = _thisDir + os.sep + 'data' + os.path.sep + '_'.join([expName, expInfo['sessionID'], 'run1', expInfo['date']])
+filename = os.path.join(outputDir, '_'.join([expName, expInfo['sessionID'], 'run1', expInfo['date']]))
 
 # An ExperimentHandler isn't essential but helps with data saving
 thisExp = data.ExperimentHandler(name=expName, version='',
@@ -54,19 +69,17 @@ endExpNow = False  # flag for 'escape' or other condition => quit the exp
 import pyglet
 display = pyglet.canvas.get_display()
 screens = display.get_screens()
-resolution = [screens[-1].width, screens[-1].height]
-import yaml
+screenIndex = 0 if singleScreen else config['monitor']['screen']
+taskScreen = screens[0] if singleScreen else screens[-1]
+resolution = [taskScreen.width, taskScreen.height]
 from psychopy import monitors
-if not os.path.exists('siteConfig.yaml'): raise IOError('Missing siteConfig.yaml - Please copy configuration text file')
-with open('siteConfig.yaml') as f:
-    config = yaml.safe_load(f)
 mon = monitors.Monitor('newMonitor')
 mon.setWidth(config['monitor']['width'])
 mon.setDistance(config['monitor']['distance'])
 mon.setSizePix(resolution)
 
 # Setup the Window
-win = visual.Window(size=resolution, fullscr=False, screen=config['monitor']['screen'], allowGUI=False, allowStencil=False,
+win = visual.Window(size=resolution, fullscr=singleScreen, screen=screenIndex, allowGUI=False, allowStencil=False,
     monitor=mon, color=[-1,-1,-1], colorSpace='rgb',
     blendMode='avg', useFBO=True,
     units='deg')
@@ -133,6 +146,11 @@ raWin = visual.Window(size=[1280,800], fullscr=False, allowGUI=True, allowStenci
     blendMode='avg', useFBO=True,
     units='deg',
     screen=0)
+if singleScreen:
+    # One (cloned) display: the participant would see the experimenter window, so hide it
+    # and keep keyboard focus on the task window
+    raWin.winHandle.set_visible(False)
+    win.winHandle.activate()
 
 raText= visual.TextStim(win=raWin, ori=0, name='raText',
     text='',    font='Arial',
@@ -964,7 +982,7 @@ for thisPracDirection in pracDirections:
             win.callOnFlip(pracInstr2Resp.clock.reset)  # t=0 on next screen flip
             event.clearEvents(eventType='keyboard')
         if pracInstr2Resp.status == STARTED:
-            theseKeys = event.getKeys(keyList=['1', 'num_1'])
+            theseKeys = event.getKeys(keyList=list(config['keys']['left']))
             
             # check for quit:
             if "escape" in theseKeys:
@@ -1080,7 +1098,7 @@ for thisPracDirection in pracDirections:
             win.callOnFlip(pracInstr3Resp.clock.reset)  # t=0 on next screen flip
             event.clearEvents(eventType='keyboard')
         if pracInstr3Resp.status == STARTED:
-            theseKeys = event.getKeys(keyList=['2', 'num_2'])
+            theseKeys = event.getKeys(keyList=list(config['keys']['right']))
             
             # check for quit:
             if "escape" in theseKeys:
@@ -2206,7 +2224,7 @@ for thisRun in runs:
         expInfo['triggerGlobalTime'] = globalClock.getTime()
         continueRoutine = False
         
-        filename = _thisDir + os.sep + u'data/' + '_'.join([expName, expInfo['sessionID'], 'run%s'%runNum, triggerWallTime.strftime('%Y-%m-%d_%H%M%S')])
+        filename = os.path.join(outputDir, '_'.join([expName, expInfo['sessionID'], 'run%s'%runNum, triggerWallTime.strftime('%Y-%m-%d_%H%M%S')]))
         continueRoutine = False
         
         if frameN == 0:
