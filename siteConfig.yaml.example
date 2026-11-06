@@ -3,6 +3,7 @@ keys:  # button box: buttons 1-4 send a b c d (button box in the right hand)
   'left': ['a']   # button 1, pointer (index) finger: left image matches
   'right': ['b']  # button 2, middle finger: right image matches
 outputDir: '~/fmri_data/EMOTION_HCPL'  # local folder for data files (created if missing)
+imageDir: '~/emotion-hcpl-images'  # task images (faces, shapes, buttons) from the HCP-D EMOTION download
 'style':  # Units: deg
   'titleLetterSize': 3
   'subtitleLetterSize': .7

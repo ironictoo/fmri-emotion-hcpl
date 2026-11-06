@@ -13,9 +13,11 @@ This repository is a modernized copy of the original HCP-L PsychoPy task,
 which is publicly available from the HCP-Development task protocols page:
 <https://www.humanconnectome.org/study/hcp-lifespan-development/project-protocol/task-protocols-hcp-development>
 
-The first commit in this repository is the original upstream task, unmodified
-(HCP-L revision `a5004dcb`, see `VERSION`). Every change since is in the git
-history and summarized in [Changes from the original](#changes-from-the-original).
+The first commit in this repository is the original upstream task (HCP-L
+revision `a5004dcb`, see `VERSION`) without its images and example media,
+which are not distributed here (see [Task images](#task-images)). Every change
+since is in the git history and summarized in
+[Changes from the original](#changes-from-the-original).
 
 ## Citation
 
@@ -88,7 +90,21 @@ cp siteConfig.yaml.example siteConfig.yaml
 ```
 
 `siteConfig.yaml` is not tracked by git, because it holds per-site settings.
-Edit your copy before the first run (see the next section).
+Edit your copy before the first run (see below).
+
+### Task images
+
+The face, shape and button images are not in this repository. Get them from
+the HCP-D EMOTION task download,
+[EMOTION-Task-Protocol.zip](https://www.humanconnectome.org/storage/app/media/protocols/EMOTION-Task-Protocol.zip)
+on the [HCP-D task protocols page](https://www.humanconnectome.org/study/hcp-lifespan-development/project-protocol/task-protocols-hcp-development),
+and copy the contents of its `images/` folder (79 files) to
+`~/emotion-hcpl-images/`, or set `imageDir` in `siteConfig.yaml` to where
+they are. The scripts stop with "Image folder not found" if the folder is
+missing. `images/` is in `.gitignore`, so a copy inside the repo is never
+committed. The same download has the original example videos and
+`EmotionSummary.pdf`, which are also left out here because they show the
+faces.
 
 ## Site configuration (`siteConfig.yaml`)
 
@@ -98,6 +114,7 @@ keys:                       # button box: buttons 1-4 send a b c d
   'left': ['a']             # button 1, pointer (index) finger: left image matches
   'right': ['b']            # button 2, middle finger: right image matches
 outputDir: '~/fmri_data/EMOTION_HCPL'   # local folder for data files
+imageDir: '~/emotion-hcpl-images'       # task images (see Task images)
 'style':                    # text sizes, in degrees of visual angle
   ...
 'monitor':
@@ -234,6 +251,8 @@ format:
 - PsychoPy: trial rows are now plain dicts, so `thisTrial.stimTop` became
   `thisTrial['stimTop']`. `launchScan` is imported from the
   `psychopy-mri-emulator` plugin, falling back to the old location.
+- Task images and the example media are not distributed (removed from the
+  whole git history); the scripts load images from `imageDir`.
 - Scanner laptop setup: trigger `t` and button box `a`/`b` in
   `siteConfig.yaml.example`; the practice button introduction uses the
   configured keys (it was fixed to `1`/`2`); `monitor: screens` for one
@@ -292,8 +311,7 @@ a `_wide.csv` from your real stimulus computer before collecting data.
   Use a USB keypress trigger.
 - Logs contain many `Clock.add() is deprecated` messages. These are harmless:
   the method still behaves as it did in PsychoPy 1.83.
-- `README.pdf` and `documentation/EmotionSummary.pdf` are the original
-  documentation. They still describe the PsychoPy 1.83.04 install and dialog
+- `README.pdf` is the original documentation. It still describes the PsychoPy 1.83.04 install and dialog
   fields (`nRuns`, `runNumber`) that this version of the script does not show.
 
 ## License

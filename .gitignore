@@ -9,3 +9,7 @@ siteConfig.yaml
 
 .venv/
 ._*
+# Task images and media with faces are not distributed here (see README)
+images/
+documentation/*.mov
+documentation/EmotionSummary.pdf

@@ -40,6 +40,13 @@ if not os.path.isabs(outputDir):
     outputDir = os.path.join(_thisDir, outputDir)
 if not os.path.isdir(outputDir):
     os.makedirs(outputDir)
+# Task images (faces, shapes, button pictures) are not distributed with this repo: they come from the
+# HCP-D EMOTION task download. imageDir is the folder that holds them.
+imageDir = os.path.expanduser(config.get('imageDir', '~/emotion-hcpl-images'))
+if not os.path.isabs(imageDir):
+    imageDir = os.path.join(_thisDir, imageDir)
+if not os.path.isdir(imageDir):
+    raise IOError('Image folder not found: %s - put the task images there or set imageDir in siteConfig.yaml' % imageDir)
 
 # Store info about the experiment session
 expName = 'EMOTION'  # from the Builder filename that created this script
@@ -251,19 +258,19 @@ def save_movie(filename, recorder1, recorder2):
 # Initialize components for Routine "pracInstr1"
 pracInstr1Clock = core.Clock()
 top_image = visual.ImageStim(win=win, name='top_image',
-    image='images/FA-mock_top.jpg', mask=None,
+    image=os.path.join(imageDir, 'FA-mock_top.jpg'), mask=None,
     ori=0, pos=trialTopPos, size=imageSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=0.0)
 left_image = visual.ImageStim(win=win, name='left_image',
-    image='images/FA-mock_left.jpg', mask=None,
+    image=os.path.join(imageDir, 'FA-mock_left.jpg'), mask=None,
     ori=0, pos=trialLeftPos, size=imageSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
 right_image = visual.ImageStim(win=win, name='right_image',
-    image='images/FA-mock_right.jpg', mask=None,
+    image=os.path.join(imageDir, 'FA-mock_right.jpg'), mask=None,
     ori=0, pos=trialRightPos, size=imageSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
@@ -276,25 +283,25 @@ right_image = visual.ImageStim(win=win, name='right_image',
 # Initialize components for Routine "pracInstr2"
 pracInstr2Clock = core.Clock()
 top = visual.ImageStim(win=win, name='top',
-    image='images/FA-mock_top.jpg', mask=None,
+    image=os.path.join(imageDir, 'FA-mock_top.jpg'), mask=None,
     ori=0, pos=trialTopPos, size=imageSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=0.0)
 left = visual.ImageStim(win=win, name='left',
-    image='images/FA-mock_left.jpg', mask=None,
+    image=os.path.join(imageDir, 'FA-mock_left.jpg'), mask=None,
     ori=0, pos=trialLeftPos, size=imageSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
 right = visual.ImageStim(win=win, name='right',
-    image='images/FA-mock_right.jpg', mask=None,
+    image=os.path.join(imageDir, 'FA-mock_right.jpg'), mask=None,
     ori=0, pos=trialRightPos, size=imageSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-2.0)
 pointerFinger = visual.ImageStim(win=win, name='pointerFinger',
-    image='images/pointerFingerButton.png', mask=None,
+    image=os.path.join(imageDir, 'pointerFingerButton.png'), mask=None,
     ori=0, pos=[0,-2.5], size=[367./454 * 4, 4],
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
@@ -304,25 +311,25 @@ pointerFinger = visual.ImageStim(win=win, name='pointerFinger',
 # Initialize components for Routine "pracInstr3"
 pracInstr3Clock = core.Clock()
 top3 = visual.ImageStim(win=win, name='top3',
-    image='images/oval-vertical.bmp', mask=None,
+    image=os.path.join(imageDir, 'oval-vertical.bmp'), mask=None,
     ori=0, pos=trialTopPos, size=imageSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=0.0)
 left3 = visual.ImageStim(win=win, name='left3',
-    image='images/circle.bmp', mask=None,
+    image=os.path.join(imageDir, 'circle.bmp'), mask=None,
     ori=0, pos=trialLeftPos, size=imageSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
 right3 = visual.ImageStim(win=win, name='right3',
-    image='images/oval-vertical.bmp', mask=None,
+    image=os.path.join(imageDir, 'oval-vertical.bmp'), mask=None,
     ori=0, pos=trialRightPos, size=imageSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-2.0)
 middleFinger = visual.ImageStim(win=win, name='middleFinger',
-    image='images/middleFingerButton.png', mask=None,
+    image=os.path.join(imageDir, 'middleFingerButton.png'), mask=None,
     ori=0, pos=[0,-2.5], size=[407./456 * 4, 4],
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
@@ -454,37 +461,37 @@ x2left = x2 - 2.25
 x2right = x2 + 2.25
 stimSize = [3.75, 3.75]
 faceTop = visual.ImageStim(win=win, name='faceTop',
-    image='images/FF-mock_top.jpg', mask=None,
+    image=os.path.join(imageDir, 'FF-mock_top.jpg'), mask=None,
     ori=0, pos=(x2, y1), size=stimSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-1.0)
 faceLeft = visual.ImageStim(win=win, name='faceLeft',
-    image='images/FF-mock_left.jpg', mask=None,
+    image=os.path.join(imageDir, 'FF-mock_left.jpg'), mask=None,
     ori=0, pos=(x2left, y2), size=stimSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-2.0)
 faceRight = visual.ImageStim(win=win, name='faceRight',
-    image='images/FF-mock_right.jpg', mask=None,
+    image=os.path.join(imageDir, 'FF-mock_right.jpg'), mask=None,
     ori=0, pos=(x2right, y2), size=stimSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-3.0)
 shapeTop = visual.ImageStim(win=win, name='shapeTop',
-    image='images/oval-horizontal.bmp', mask=None,
+    image=os.path.join(imageDir, 'oval-horizontal.bmp'), mask=None,
     ori=0, pos=(x1, y1), size=stimSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-4.0)
 shapeLeft = visual.ImageStim(win=win, name='shapeLeft',
-    image='images/oval-horizontal.bmp', mask=None,
+    image=os.path.join(imageDir, 'oval-horizontal.bmp'), mask=None,
     ori=0, pos=(x1left, y2), size=stimSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
     texRes=128, interpolate=True, depth=-5.0)
 shapeRight = visual.ImageStim(win=win, name='shapeRight',
-    image='images/circle.bmp', mask=None,
+    image=os.path.join(imageDir, 'circle.bmp'), mask=None,
     ori=0, pos=(x1right, y2), size=stimSize,
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
@@ -1182,7 +1189,7 @@ for thisPracDirection in pracDirections:
             exTopImage.frameNStart = frameN  # exact frame index
             exTopImage.setAutoDraw(True)
         if exTopImage.status == STARTED:  # only update if being drawn
-            exTopImage.setImage('images/FA-mock_top.jpg', log=False)
+            exTopImage.setImage(os.path.join(imageDir, 'FA-mock_top.jpg'), log=False)
         
         # *exLeftImage* updates
         if t >= 0.0 and exLeftImage.status == NOT_STARTED:
@@ -1191,7 +1198,7 @@ for thisPracDirection in pracDirections:
             exLeftImage.frameNStart = frameN  # exact frame index
             exLeftImage.setAutoDraw(True)
         if exLeftImage.status == STARTED:  # only update if being drawn
-            exLeftImage.setImage('images/FA-mock_left.jpg', log=False)
+            exLeftImage.setImage(os.path.join(imageDir, 'FA-mock_left.jpg'), log=False)
         
         # *exRightImage* updates
         if t >= 0.0 and exRightImage.status == NOT_STARTED:
@@ -1200,7 +1207,7 @@ for thisPracDirection in pracDirections:
             exRightImage.frameNStart = frameN  # exact frame index
             exRightImage.setAutoDraw(True)
         if exRightImage.status == STARTED:  # only update if being drawn
-            exRightImage.setImage('images/FA-mock_right.jpg', log=False)
+            exRightImage.setImage(os.path.join(imageDir, 'FA-mock_right.jpg'), log=False)
         
         # *exTrialResp* updates
         if t >= 0 and exTrialResp.status == NOT_STARTED:
@@ -1398,9 +1405,9 @@ for thisPracDirection in pracDirections:
         frameN = -1
         routineTimer.add(2.000000)
         # update component parameters for each repeat
-        topImageExample.setImage(os.path.join('images', stimTop))
-        leftImageExample.setImage(os.path.join('images', stimLeft))
-        rightImageExample.setImage(os.path.join('images', stimRight))
+        topImageExample.setImage(os.path.join(imageDir, stimTop))
+        leftImageExample.setImage(os.path.join(imageDir, stimLeft))
+        rightImageExample.setImage(os.path.join(imageDir, stimRight))
         exampleTrialResp = event.BuilderKeyResponse()  # create an object of type KeyResponse
         exampleTrialResp.status = NOT_STARTED
         number_trials = exampleTrials.thisN + 1
@@ -2507,9 +2514,9 @@ for thisRun in runs:
             frameN = -1
             routineTimer.add(2.000000)
             # update component parameters for each repeat
-            topImage.setImage(os.path.join('images', stimTop))
-            leftImage.setImage(os.path.join('images', stimLeft))
-            rightImage.setImage(os.path.join('images', stimRight))
+            topImage.setImage(os.path.join(imageDir, stimTop))
+            leftImage.setImage(os.path.join(imageDir, stimLeft))
+            rightImage.setImage(os.path.join(imageDir, stimRight))
             trialResp = event.BuilderKeyResponse()  # create an object of type KeyResponse
             trialResp.status = NOT_STARTED
             number_trials = ((trials.thisN + 1) + (blocks.thisN*6))
